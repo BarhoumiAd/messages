@@ -1,6 +1,7 @@
 # Message App
 ## Architecture
-The message app is implemented with nodejs. The database is storage is postgres.
+User calls the Restful API to manage messages. Messages are stored in postgres database.
+![Architecture](./public/images/message_architecture.png)
 ## Endpoints
 The app contains 5 endpoints:
 
