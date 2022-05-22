@@ -1,0 +1,14 @@
+**/node_modules
+node_modules
+.nyc_output
+.git
+.github
+.vscode
+.eslintrc.js
+.gitignore
+.gitmodules
+.prettierignore
+.prettierrc
+README.md
+tests
+helm

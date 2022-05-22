@@ -1,0 +1,33 @@
+version: '3.6'
+services:
+  messages:
+    container_name: message
+    build: ../
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      PG_USER: $PG_USER
+      PG_PASSWORD: $PG_PASSWORD
+      PG_HOST: 'host.docker.internal'
+      PG_PORT: $PG_PORT
+      PG_DB: $PG_DB
+      MODE: "development"
+  postgres:
+    container_name: message-db
+    image: $PG_IMAGE
+    restart: always
+    ports:
+      - '$PG_PORT:5432'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: $PG_USER
+      POSTGRES_PASSWORD: $PG_PASSWORD
+volumes:
+  db_data:
