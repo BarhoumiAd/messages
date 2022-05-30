@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: default
+  labels:
+    name: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: redis
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        name: redis
+    spec:
+      containers:
+      - image: redis:latest
+        name: redis
+        command:
+          - redis-server
+          - "/redis-master/redis.conf"
+        env:
+        - name: MASTER
+          value: "true"
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "yes"
+        ports:
+         - containerPort: 6379
+        livenessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+        readinessProbe:
+            exec:
+              command:
+              - redis-cli
+              - ping
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+        # resources:
+        #   limits:
+        #     cpu: 600m
+        #     memory: 1Gi
+        #   requests:
+        #     cpu: 60m
+        #     memory: 128Mi
+        volumeMounts:
+        - mountPath: /redis-master-data
+          name: data
+        - mountPath: /redis-master
+          name: config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: redis-config
+          items:
+          - key: redis-config
+            path: redis.conf  

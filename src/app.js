@@ -50,7 +50,7 @@ app.get(`${config.APIV1}/readiness`, async (req, res) => {
   let pgUp = await databaseMgr.pgHealth(context);
   let waiting = MAX_WAITING;
   while (!pgUp && waiting > 0) {
-    wait(5);
+    await wait(5);
     pgUp = await databaseMgr.pgHealth(context);
     waiting -= 5;
   }
@@ -61,19 +61,41 @@ app.get(`${config.APIV1}/readiness`, async (req, res) => {
 if (config.devMode()) {
   // wait until postgres is up and running
   let pgUp = false;
+  // databaseMgr
+  //   .pgHealth(context)
+  //   .then(async () => {
+  //     try {
+  //       await setup(context);
+  //     } catch (error) {
+  //       console.log(`ERROR`);
+  //     }
+  //   })
+  //   .catch((error) => {
+  //     context.logger().warn(error.message);
+  //   });
   (async function () {
-    pgUp = await databaseMgr.pgHealth(context);
-    while (!pgUp) {
-      wait(5);
-      pgUp = await databaseMgr.pgHealth(context);
-    }
     try {
+      pgUp = await databaseMgr.pgHealth(context);
+      while (!pgUp) {
+        await wait(5);
+        pgUp = await databaseMgr.pgHealth(context);
+      }
       // setup the database
       await setup(context);
+      // this function will store data from redis to postgres then flush it from redis
+      databaseMgr.synchronize();
     } catch (error) {
-      context.logger().warn(error.message);
+      context.logger().warn(`[ERROR on Synchronize ], ${error.message}`);
+      context.logger().debug(error.stack);
     }
-  })();
+  })()
+    .then(() => {
+      context.logger().info(`Database successfully initialized`);
+    })
+    .catch((error) => {
+      context.logger().warn(`[ERROR on Synchronize IIFE call], ${error.message}`);
+      context.logger().debug(error.stack);
+    });
 }
 
 app.use(`${config.APIV1}/api/docs`, swaggerUi.serve);

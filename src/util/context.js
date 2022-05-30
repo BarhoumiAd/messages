@@ -13,8 +13,12 @@ class Context {
   }
 
   sql() {
-    if (!this.sqlService) this.sqlService = new SQL(this);
-    return this.sqlService;
+    try {
+      if (!this.sqlService) this.sqlService = new SQL(this);
+      return this.sqlService;
+    } catch (error) {
+      this.logger().warn(`[ERROR] failed to create SQL service`);
+    }
   }
 }
 

@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const { Pool } = require('pg');
 const { config } = require('../util/config');
 
@@ -8,19 +7,27 @@ const CONNECTION_TIMEOUT = 300000;
 
 class ConnectionPool {
   get(context) {
-    const connection = new Pool({
-      host: config.pgHost,
-      port: config.pgPort,
-      user: config.pgUser,
-      password: config.pgPassword,
-      database: config.pgDbName,
+    try {
+      const pool = new Pool({
+        host: config.pgHost,
+        port: config.pgPort,
+        user: config.pgUser,
+        password: config.pgPassword,
+        database: config.pgDbName,
 
-      max: NUMBER_OF_CONNECTIONS,
-      idleTimeoutMillis: IDLE_TIMEOUT,
-      connectionTimeoutMillis: CONNECTION_TIMEOUT,
-    });
-    context.pgClient = connection;
-    return connection;
+        max: NUMBER_OF_CONNECTIONS,
+        idleTimeoutMillis: IDLE_TIMEOUT,
+        connectionTimeoutMillis: CONNECTION_TIMEOUT,
+      });
+      context.pgClient = pool;
+      pool.on('error', function () {
+        context.pgClient = null;
+      });
+      return pool;
+    } catch (error) {
+      context.logger().warn(`[ERROR Connection Pool], ${error.message}`);
+      throw error;
+    }
   }
 }
 
@@ -39,16 +46,8 @@ class SQL {
       const result = await this.context.pgClient.query(sql, positionalParams);
       return result;
     } catch (error) {
-      if (config.devMode() && !_.get(this.context, 'req.headers.suppress-sql-error-dump')) {
-        let err = '';
-        if (error.position) {
-          let start = error.position - 10;
-          if (start < 0) start = 0;
-          err = `. Look for: "${sql.substr(start, 20)}"`;
-        }
-        this.context.logger().error(`${error.message}${err}\n\n${sql}`);
-      }
-      throw error;
+      this.context.logger().warn(`[ERROR Executing Query], ${error.message}`);
+      // throw error;
     }
   }
 }

@@ -16,6 +16,10 @@ services:
       PG_PORT: $PG_PORT
       PG_DB: $PG_DB
       MODE: "development"
+      REDIS_UNAME: $REDIS_UNAME
+      REDIS_PORT: $REDIS_PORT
+      REDIS_HOST: $REDIS_HOST
+      REDIS_PASS: $REDIS_PASS
   postgres:
     container_name: message-db
     image: $PG_IMAGE
@@ -29,5 +33,20 @@ services:
     environment:
       POSTGRES_USER: $PG_USER
       POSTGRES_PASSWORD: $PG_PASSWORD
+redis:
+    container_name: redis
+    image: $REDIS_IMAGE
+    ports: 
+      - '6379:6379'
+    restart: always
+    environment:
+      # - REDIS_DISABLE_COMMANDS=FLUSHDB,FLUSHALL
+      - ALLOW_EMPTY_PASSWORD=yes
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - 'redis_data:/bitnami/redis/data'
 volumes:
   db_data:
+  redis_data:
+    driver: local

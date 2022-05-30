@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+  
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Start service",
+        "program": "${workspaceFolder}/src/app.js",
+        "env": {
+          "MODE": "development",
+          "PG_HOST": "localhost",
+          "PG_PORT": "5432",
+          "PG_USER": "qlik",
+          "PG_PASSWORD": "qlik",
+          "PG_DB": "qlik",
+          "LOG_LEVEL": "DEBUG",
+          "REDIS_UNAME": "admin",
+          "REDIS_PORT": "6379",
+          "REDIS_HOST": "localhost",
+          "REDIS_PASS": ""
+        }
+      }
+    ]
+  }

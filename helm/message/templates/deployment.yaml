@@ -48,8 +48,6 @@ spec:
           env:
           - name: MODE
             value: "production"
-          - name: FLASK_ENV
-            value: production
           - name: PG_USER
             valueFrom:
               secretKeyRef:
@@ -66,6 +64,12 @@ spec:
             value: "pg-svc.default.svc.cluster.local"
           - name: PG_DB
             value: "qlik"
+          - name: REDIS_UNAME
+            value: ""
+          - name: REDIS_PORT
+            value: "6379" 
+          - name: REDIS_HOST
+            value: "redis-svc.default.svc.cluster.local" 
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
