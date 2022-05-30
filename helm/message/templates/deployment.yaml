@@ -48,8 +48,6 @@ spec:
           env:
           - name: MODE
             value: "production"
-          - name: FLASK_ENV
-            value: production
           - name: PG_USER
             valueFrom:
               secretKeyRef:

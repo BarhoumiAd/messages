@@ -12,7 +12,6 @@ class Config {
   }
 
   devMode() {
-    console.log(`MODE: ${this.mode}`);
     return this.mode.toLowerCase() === 'development';
   }
 }
