@@ -1,7 +1,6 @@
 const Redis = require('ioredis');
 const { config } = require('../util/config');
 const retention = 86400;
-const SYNCUP_NEEDED = config.SYNCUP_NEEDED;
 class Cache {
   init() {
     const { logger } = require('./logger');
@@ -65,16 +64,10 @@ class Cache {
     if (!this.initialized) return { status: 400, message: 'not initialized' };
     return { message: this.redis.status, endpoint: config.redis.REDIS_HOST };
   }
-
-  /** Return true if data in redis is synchronized with Pg */
-  async syncStatus() {
-    const keys = await this.getAll(`${SYNCUP_NEEDED}.*`);
-    return keys.length === 0;
-  }
 }
 
 if (!global.cache) {
   global.cache = new Cache();
 }
 
-module.exports = { cache: global.cache, SYNCUP_NEEDED };
+module.exports = { cache: global.cache };

@@ -83,7 +83,7 @@ class DatabaseMgr {
     let healthy = true;
     try {
       const health = await context.sql().query(`SELECT 1;`);
-      return health.rowCount === 1;
+      healthy = health.rowCount === 1;
     } catch (error) {
       healthy = false;
       context.logger().error(`Postgres is down: ${error.message}`);
@@ -99,8 +99,6 @@ class DatabaseMgr {
     let result;
     if (id) {
       result = await cache.get(id);
-      // if the key does not exist then most probably, it is a key that is not synced up yet to postgres
-      // if (!result) result = await cache.get(`${SYNCUP_NEEDED}${id}`);
     } else {
       result = await cache.getAll('*');
     }
@@ -109,7 +107,6 @@ class DatabaseMgr {
 
   async bulkPersist(context, data) {
     const keysToExpires = [];
-    // TODO Function to improve, use bulk insert to insert all records at once
     if (await this.pgHealth(context)) {
       for (const record of data) {
         await context.sql().query(INSERT_QUERY, [record.id, record.text, record.palindrome]);

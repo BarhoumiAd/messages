@@ -61,18 +61,6 @@ app.get(`${config.APIV1}/readiness`, async (req, res) => {
 if (config.devMode()) {
   // wait until postgres is up and running
   let pgUp = false;
-  // databaseMgr
-  //   .pgHealth(context)
-  //   .then(async () => {
-  //     try {
-  //       await setup(context);
-  //     } catch (error) {
-  //       console.log(`ERROR`);
-  //     }
-  //   })
-  //   .catch((error) => {
-  //     context.logger().warn(error.message);
-  //   });
   (async function () {
     try {
       pgUp = await databaseMgr.pgHealth(context);

@@ -47,7 +47,7 @@ class SQL {
       return result;
     } catch (error) {
       this.context.logger().warn(`[ERROR Executing Query], ${error.message}`);
-      // throw error;
+      throw error;
     }
   }
 }
